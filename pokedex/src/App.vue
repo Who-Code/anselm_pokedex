@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import Pokedex from './components/Pokedex.vue';
 </script>
-
+  
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
