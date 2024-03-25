@@ -1,6 +1,7 @@
 <template>
   <div class="pokedex">
     <h1>Pokedex</h1>
+    <router-link to="/stats">Zu den Statistiken</router-link>
     <div>
       <input type="text" v-model="searchQuery" placeholder="Suchen..." />
     </div>
@@ -36,14 +37,12 @@ const filteredPokemons = computed(() => {
 }
 .grid {
   display: grid;
-  /* Reduziert die minimale Breite der Karten auf 100px */
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  /* Verkleinert die Lücke zwischen den Karten */
   gap: 0.5rem;
 }
 .card {
   border: 1px solid #ccc;
-  padding: 0.8rem; /* Optional: Anpassung des Innenabstands */
+  padding: 0.8rem;
   text-align: center;
 }
 </style>
