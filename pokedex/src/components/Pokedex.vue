@@ -7,7 +7,7 @@
     </div>
     <div class="grid">
         <div v-for="pokemon in filteredPokemons" :key="pokemon.name" class="card">
-          <router-link to="/stats">
+          <router-link :to="`/stats/${pokemon.name}`">
           <p>{{ pokemon.name }}</p>
         </router-link>
         </div>

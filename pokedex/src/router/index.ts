@@ -5,7 +5,7 @@ import Stats from '../components/Stats.vue';
 
 const routes = [
     { path: '/', component: Pokedex },
-    { path: '/stats', component: Stats },
+    { path: '/stats/:name', component: Stats },
   ];
 
 const router = createRouter({
