@@ -1,14 +1,16 @@
 <template>
   <div class="pokedex">
     <h1>Pokedex</h1>
-    <router-link to="/stats">Zu den Statistiken</router-link>
+    <router-link to="/stats">Zu Stats</router-link>
     <div>
       <input type="text" v-model="searchQuery" placeholder="Suchen..." />
     </div>
     <div class="grid">
-      <div v-for="pokemon in filteredPokemons" :key="pokemon.name" class="card">
-        <p>{{ pokemon.name }}</p>
-      </div>
+        <div v-for="pokemon in filteredPokemons" :key="pokemon.name" class="card">
+          <router-link to="/stats">
+          <p>{{ pokemon.name }}</p>
+        </router-link>
+        </div>
     </div>
   </div>
 </template>
