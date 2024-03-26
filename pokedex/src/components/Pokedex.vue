@@ -1,7 +1,6 @@
 <template>
   <div class="pokedex">
     <h1>Pokedex</h1>
-    <router-link to="/stats">Zu Stats</router-link>
     <div>
       <input type="text" v-model="searchQuery" placeholder="Suchen..." />
     </div>
@@ -21,10 +20,16 @@ const pokemons = ref<Array<{ name: string }>>([]);
 const searchQuery = ref("");
 
 fetch("https://pokeapi.co/api/v2/pokemon?limit=1025")
-  .then((response) => response.json())
-  .then((data) => {
-    pokemons.value = data.results;
-  });
+  .then(response => {
+      if (!response.ok) {
+        throw new Error('Netzwerkantwort war nicht ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      pokemons.value = data.results;
+    })
+    .catch(error => console.error('Fehler beim Fetchen der Pokémon-Daten:', error));
 const filteredPokemons = computed(() => {
   return pokemons.value.filter((pokemon) =>
     pokemon.name.toLowerCase().includes(searchQuery.value.toLowerCase())
