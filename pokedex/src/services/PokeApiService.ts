@@ -192,16 +192,24 @@ export type Type = {
 export class PokeApiService {
   private baseUrl: string = "https://pokeapi.co/api/v2/";
 
-  public Name = async (offset: number, limit: number) => {
+  public Name = (offset: number, limit: number): Promise<{ count: number; results: Pokemon[] }> => {
     return new Promise(async (resolve) => {
       const listResult = await fetch(this.baseUrl + "pokemon?offset=" + offset + "&limit=" + limit);
       if (!listResult.ok) {
         throw new Error("Netzwerkantwort war nicht ok");
       }
       const parsedResult = (await listResult.json()) as searchResponse;
-      setTimeout(() => {
-        resolve(parsedResult);
-      }, 3000);
+      const detailList: Pokemon[] = [];
+      for (const result of parsedResult.results) {
+        const resolvedPokemon = await this.get(result.name);
+        detailList.push(resolvedPokemon);
+      }
+      //setTimeout(() => {
+      resolve({
+        count: parsedResult.count,
+        results: detailList,
+      });
+      // }, 3000);
     });
   };
 
