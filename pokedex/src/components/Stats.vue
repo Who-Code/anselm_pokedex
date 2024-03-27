@@ -18,6 +18,12 @@
       <p>Lade Daten...</p>
     </div>
     <img class="bild" :src="pokemon?.sprites.front_default" alt="" />
+    <div>
+      <div>Geräusche von: {{ pokemonName }}</div>
+      <div class="buttonContainer">
+        <button class="soundSpielen" @click.prevent="playSound(pokemon?.cries.latest)"></button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -36,6 +42,14 @@ const loadData = async () => {
 };
 
 onMounted(loadData);
+
+const playSound = (sound) => {
+  if (sound) {
+    const audio = new Audio(sound);
+    audio.volume = 0.5;
+    audio.play();
+  }
+};
 </script>
 
 <style>
@@ -76,5 +90,23 @@ onMounted(loadData);
   display: block;
   width: 100px;
   height: 100px;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.soundSpielen {
+  display: flex;
+  width: 50px;
+  height: 50px;
+  border-radius: 40px;
+  border: 0px solid #fff5e6;
+  background-image: url("@/assets/PlayButton.png");
+  background-size: cover;
+  background-position: center;
 }
 </style>
