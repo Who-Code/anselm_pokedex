@@ -21,7 +21,7 @@
     <div>
       <div>Geräusche von: {{ pokemonName }}</div>
       <div class="buttonContainer">
-        <button class="soundSpielen" @click.prevent="playSound(pokemon?.cries.latest)"></button>
+        <button :disabled="IsLoading" class="soundSpielen" @click.prevent="playSound(pokemon?.cries.latest)"></button>
       </div>
     </div>
   </div>
@@ -36,6 +36,7 @@ const route = useRoute();
 const pokemonName = route.params.name;
 const pokemon: Ref<Pokemon | null> = ref(null);
 const Api = new PokeApiService();
+const IsLoading = ref(false);
 
 const loadData = async () => {
   pokemon.value = await Api.get(pokemonName as string);
@@ -44,11 +45,13 @@ const loadData = async () => {
 onMounted(loadData);
 
 const playSound = (sound) => {
+  IsLoading.value = true;
   if (sound) {
     const audio = new Audio(sound);
     audio.volume = 0.5;
     audio.play();
   }
+  IsLoading.value = false;
 };
 </script>
 
