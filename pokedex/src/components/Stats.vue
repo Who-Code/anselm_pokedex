@@ -23,7 +23,7 @@ import { PokeApiService, type Pokemon } from "@/services/PokeApiService";
 
 const route = useRoute();
 const pokemonName = route.params.name;
-const pokemon : Ref<Pokemon | null>= ref(null);
+const pokemon: Ref<Pokemon | null> = ref(null);
 const Api = new PokeApiService();
 
 const loadData = async () => {
