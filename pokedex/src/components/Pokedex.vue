@@ -81,6 +81,7 @@ const filteredPokemons = computed(() => {
 
 .head {
   width: 70%;
+  background-color: #fffdfc;
 }
 
 .head input {
@@ -92,6 +93,7 @@ const filteredPokemons = computed(() => {
 }
 
 .grid {
+  background-color: #fff9f4;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 0.5rem;
@@ -111,6 +113,9 @@ const filteredPokemons = computed(() => {
 }
 
 .foot button {
+  border-radius: 4px;
+  border-width: 0.1px;
+  border-color: #fff5e6;
   height: 100%;
 }
 

@@ -17,6 +17,7 @@
     <div v-else>
       <p>Lade Daten...</p>
     </div>
+    <img class="bild" :src="pokemon?.sprites.front_default" alt="" />
   </div>
 </template>
 
@@ -66,5 +67,14 @@ onMounted(loadData);
 
 .Nummer {
   margin: 5px;
+}
+
+.bild {
+  position: relative;
+  left: -300px;
+  top: -350px;
+  display: block;
+  width: 100px;
+  height: 100px;
 }
 </style>
