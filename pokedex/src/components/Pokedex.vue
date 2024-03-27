@@ -16,7 +16,9 @@
       </div>
     </div>
     <div class="foot">
-      <div><button :disabled="IsLoading" @click="back" v-show="offset > 0">Zurück</button></div>
+      <div>
+        <button :disabled="IsLoading" @click="back" v-show="offset > 0">Zurück</button>
+      </div>
       <div>
         <button :disabled="IsLoading" @click="next" v-show="showNextButton">Nächste</button>
       </div>
