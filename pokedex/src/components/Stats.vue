@@ -21,7 +21,7 @@
     <div>
       <div>Geräusche von: {{ pokemonName }}</div>
       <div class="buttonContainer">
-        <button :disabled="IsLoading" class="soundSpielen" @click.prevent="playSound(pokemon?.cries.latest)"></button>
+        <button :disabled="IsLoading" class="soundSpielen" @click.prevent="playSound(pokemon?.cries.latest)"><img class="knopf" :src="pokemon?.sprites.front_default" alt="" /></button>
       </div>
     </div>
   </div>
@@ -103,13 +103,30 @@ const playSound = (sound) => {
 }
 
 .soundSpielen {
-  display: flex;
+  
+  background-color: #F5F5DC;
+  padding: 30px 30px;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+  transition: background-color 0.5s ease;
+  border-radius: 40px;
+  border: none;
+  width: 20px;
+  height: 20px;
+}
+
+.soundSpielen:hover {
+  background-color: #EDE9D9;
+}
+
+.knopf {
+  position: relative;
+  left: -25px;
+  top: -25px;
+  display: block;
   width: 50px;
   height: 50px;
-  border-radius: 40px;
-  border: 0px solid #fff5e6;
-  background-image: url("@/assets/PlayButton.png");
-  background-size: cover;
-  background-position: center;
 }
+
 </style>
