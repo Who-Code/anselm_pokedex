@@ -19,6 +19,7 @@
       <div>
         <button :disabled="IsLoading" @click="back" v-show="offset > 0">Zurück</button>
       </div>
+      {{ aktuelleSeite }}
       <div>
         <button :disabled="IsLoading" @click="next" v-show="showNextButton">Nächste</button>
       </div>
@@ -29,10 +30,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { PokeApiService, type Pokemon } from "@/services/PokeApiService";
+import { useRouter, useRoute } from "vue-router";
 
+const router = useRouter();
+const route = useRoute();
 const pokemons = ref<Array<Pokemon>>([]);
 const searchQuery = ref("");
-const Api = new PokeApiService();
+const Api = PokeApiService.getInstance();
 const offset = ref(0);
 const PageSize = ref(20);
 const PokemonCount = ref(0);
@@ -42,25 +46,43 @@ const showNextButton = computed(() => {
   return offset.value + PageSize.value < PokemonCount.value;
 });
 
+const aktuelleSeite = computed(() => {
+  const aktuelleSeite = offset.value / PageSize.value + 1;
+  return aktuelleSeite;
+});
+
 const next = () => {
-  offset.value += PageSize.value;
-  loadData();
+  changePage(PageSize.value);
 };
 
 const back = () => {
-  offset.value -= PageSize.value;
-  loadData();
+  changePage(-1 * PageSize.value);
+};
+
+const changePage = async (changeValue: number) => {
+  offset.value += changeValue;
+  await router.push(`/pokedex/${offset.value}`);
+  init();
 };
 
 const loadData = async () => {
   IsLoading.value = true;
+  await Api.all();
   const response = await Api.Name(offset.value, PageSize.value);
   PokemonCount.value = response.count;
   pokemons.value = response.results;
   IsLoading.value = false;
 };
 
-onMounted(loadData);
+const init = () => {
+  const pageParam = parseInt(route.params.page as string);
+  offset.value = pageParam;
+  loadData();
+};
+
+onMounted(() => {
+  init();
+});
 
 const filteredPokemons = computed(() => {
   return pokemons.value.filter((pokemon) =>

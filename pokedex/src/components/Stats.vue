@@ -3,7 +3,7 @@
     <div class="headStats">
       <h1>Stats von:</h1>
       <h2 class="Name">{{ pokemonName }}</h2>
-      <router-link to="/">Zurück zum Pokedex</router-link>
+      <button @click="goBack">Back</button>
     </div>
     <div class="midle" v-if="pokemon?.stats">
       <h2>Stats</h2>
@@ -21,35 +21,50 @@
     <div>
       <div>Geräusche von: {{ pokemonName }}</div>
       <div class="buttonContainer">
-        <button :disabled="IsLoading" class="soundSpielen" @click.prevent="playSound(pokemon?.cries.latest)"><img class="knopf" :src="pokemon?.sprites.front_default" alt="" /></button>
+        <button
+          :disabled="IsLoading"
+          class="soundSpielen"
+          @click.prevent="playSound(pokemon?.cries.latest)"
+        >
+          <img class="pokeImage" :src="pokemon?.sprites.front_default" alt="" />
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { ref, onMounted, Ref } from "vue";
 import { PokeApiService, type Pokemon } from "@/services/PokeApiService";
 
+const router = useRouter();
 const route = useRoute();
 const pokemonName = route.params.name;
 const pokemon: Ref<Pokemon | null> = ref(null);
-const Api = new PokeApiService();
+const Api = PokeApiService.getInstance();
 const IsLoading = ref(false);
+const audioPlayer = new Audio();
 
 const loadData = async () => {
   pokemon.value = await Api.get(pokemonName as string);
 };
 
+const goBack = () => {
+  router.back();
+};
+
 onMounted(loadData);
 
-const playSound = (sound) => {
+const playSound = (sound: string) => {
   IsLoading.value = true;
-  if (sound) {
-    const audio = new Audio(sound);
-    audio.volume = 0.5;
-    audio.play();
+
+  const endedLastPlayback = audioPlayer.src === "" || audioPlayer.ended;
+
+  if (sound !== "" && endedLastPlayback) {
+    audioPlayer.src = sound;
+    audioPlayer.volume = 0.5;
+    audioPlayer.play();
   }
   IsLoading.value = false;
 };
@@ -103,30 +118,25 @@ const playSound = (sound) => {
 }
 
 .soundSpielen {
-  
-  background-color: #F5F5DC;
-  padding: 30px 30px;
+  background-color: #f5f5dc;
   display: inline-block;
   margin: 4px 2px;
   cursor: pointer;
   transition: background-color 0.5s ease;
   border-radius: 40px;
   border: none;
-  width: 20px;
-  height: 20px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .soundSpielen:hover {
-  background-color: #EDE9D9;
+  background-color: #ede9d9;
 }
 
-.knopf {
-  position: relative;
-  left: -25px;
-  top: -25px;
-  display: block;
-  width: 50px;
-  height: 50px;
+.pokeImage {
+  width: 100;
 }
-
 </style>

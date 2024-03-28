@@ -190,7 +190,43 @@ export type Type = {
 };
 
 export class PokeApiService {
+  private static instance: PokeApiService;
+
+  public static getInstance(): PokeApiService {
+    if (!PokeApiService.instance) {
+      PokeApiService.instance = new PokeApiService();
+    }
+
+    return PokeApiService.instance;
+  }
+
   private baseUrl: string = "https://pokeapi.co/api/v2/";
+
+  public allPokemonList: Pokemon[] = [];
+
+  public all = async (): Promise<Pokemon[]> => {
+    console.log("All Endpoint");
+    return new Promise(async (resolve) => {
+      if (this.allPokemonList.length > 0) {
+        console.log("Resolve Pokemons");
+        resolve(this.allPokemonList);
+      } else {
+        console.log("Reload data");
+        const listResult = await fetch(this.baseUrl + "pokemon?limit=12");
+        if (!listResult.ok) {
+          throw new Error("Netzwerkantwort war nicht ok");
+        }
+        const parsedResult = (await listResult.json()) as searchResponse;
+        const detailList: Pokemon[] = [];
+        for (const result of parsedResult.results) {
+          const resolvedPokemon = await this.get(result.name);
+          detailList.push(resolvedPokemon);
+        }
+        this.allPokemonList = detailList;
+        resolve(this.allPokemonList);
+      }
+    });
+  };
 
   public Name = (offset: number, limit: number): Promise<{ count: number; results: Pokemon[] }> => {
     return new Promise(async (resolve) => {
