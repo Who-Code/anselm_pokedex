@@ -202,9 +202,9 @@ export class PokeApiService {
 
   private baseUrl: string = "https://pokeapi.co/api/v2/";
 
-  public allPokemonList: Pokemon[] = [];
+  public allPokemonList: searchItem[] = [];
 
-  public all = async (): Promise<Pokemon[]> => {
+  public all = async (): Promise<searchItem[]> => {
     console.log("All Endpoint");
     return new Promise(async (resolve) => {
       if (this.allPokemonList.length > 0) {
@@ -212,37 +212,34 @@ export class PokeApiService {
         resolve(this.allPokemonList);
       } else {
         console.log("Reload data");
-        const listResult = await fetch(this.baseUrl + "pokemon?limit=12");
+        const listResult = await fetch(this.baseUrl + "pokemon?limit=1300");
         if (!listResult.ok) {
           throw new Error("Netzwerkantwort war nicht ok");
         }
         const parsedResult = (await listResult.json()) as searchResponse;
-        const detailList: Pokemon[] = [];
+        /*const detailList: Pokemon[] = [];
         for (const result of parsedResult.results) {
           const resolvedPokemon = await this.get(result.name);
           detailList.push(resolvedPokemon);
-        }
-        this.allPokemonList = detailList;
+        }*/
+        this.allPokemonList = parsedResult.results;
         resolve(this.allPokemonList);
       }
     });
   };
 
-  public Name = (offset: number, limit: number): Promise<{ count: number; results: Pokemon[] }> => {
+  public List = (offset: number, limit: number): Promise<{ count: number; results: Pokemon[] }> => {
     return new Promise(async (resolve) => {
-      const listResult = await fetch(this.baseUrl + "pokemon?offset=" + offset + "&limit=" + limit);
-      if (!listResult.ok) {
-        throw new Error("Netzwerkantwort war nicht ok");
-      }
-      const parsedResult = (await listResult.json()) as searchResponse;
+      const CurrentPageContent = this.allPokemonList.slice(offset, offset + limit);
+      console.log(CurrentPageContent);
       const detailList: Pokemon[] = [];
-      for (const result of parsedResult.results) {
+      for (const result of CurrentPageContent) {
         const resolvedPokemon = await this.get(result.name);
         detailList.push(resolvedPokemon);
       }
       //setTimeout(() => {
       resolve({
-        count: parsedResult.count,
+        count: this.allPokemonList.length,
         results: detailList,
       });
       // }, 3000);

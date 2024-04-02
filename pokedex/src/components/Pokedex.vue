@@ -31,16 +31,19 @@
 import { ref, computed, onMounted } from "vue";
 import { PokeApiService, type Pokemon } from "@/services/PokeApiService";
 import { useRouter, useRoute } from "vue-router";
+import { searchItem } from "@/services/PokeApiService";
 
 const router = useRouter();
 const route = useRoute();
 const pokemons = ref<Array<Pokemon>>([]);
+const AllPokemons = ref<Array<searchItem>>([]);
 const searchQuery = ref("");
 const Api = PokeApiService.getInstance();
 const offset = ref(0);
 const PageSize = ref(20);
 const PokemonCount = ref(0);
 const IsLoading = ref(false);
+
 
 const showNextButton = computed(() => {
   return offset.value + PageSize.value < PokemonCount.value;
@@ -67,8 +70,8 @@ const changePage = async (changeValue: number) => {
 
 const loadData = async () => {
   IsLoading.value = true;
-  await Api.all();
-  const response = await Api.Name(offset.value, PageSize.value);
+  AllPokemons.value = await Api.all();
+  const response = await Api.List(offset.value, PageSize.value);
   PokemonCount.value = response.count;
   pokemons.value = response.results;
   IsLoading.value = false;
