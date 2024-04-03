@@ -204,6 +204,22 @@ export class PokeApiService {
 
   public allPokemonList: searchItem[] = [];
 
+  public filteredPokemonList: searchItem[] = [];
+
+  public pagePokemonList: Pokemon[] = [];
+
+  public pokemonDetails: Record<string, Pokemon> = {};
+
+  public search = (searchString: string) => {
+    if (!searchString || searchString === "") {
+      this.filteredPokemonList = this.allPokemonList;
+      return;
+    }
+    this.filteredPokemonList = this.allPokemonList.filter((p) =>
+      p.name.toLowerCase().includes(searchString.toLowerCase())
+    );
+  };
+
   public all = async (): Promise<searchItem[]> => {
     console.log("All Endpoint");
     return new Promise(async (resolve) => {
@@ -212,7 +228,7 @@ export class PokeApiService {
         resolve(this.allPokemonList);
       } else {
         console.log("Reload data");
-        const listResult = await fetch(this.baseUrl + "pokemon?limit=1300");
+        const listResult = await fetch(this.baseUrl + "pokemon?limit=1025");
         if (!listResult.ok) {
           throw new Error("Netzwerkantwort war nicht ok");
         }
@@ -223,6 +239,7 @@ export class PokeApiService {
           detailList.push(resolvedPokemon);
         }*/
         this.allPokemonList = parsedResult.results;
+        this.search("");
         resolve(this.allPokemonList);
       }
     });
@@ -230,8 +247,7 @@ export class PokeApiService {
 
   public List = (offset: number, limit: number): Promise<{ count: number; results: Pokemon[] }> => {
     return new Promise(async (resolve) => {
-      const CurrentPageContent = this.allPokemonList.slice(offset, offset + limit);
-      console.log(CurrentPageContent);
+      const CurrentPageContent = this.filteredPokemonList.slice(offset, offset + limit);
       const detailList: Pokemon[] = [];
       for (const result of CurrentPageContent) {
         const resolvedPokemon = await this.get(result.name);
@@ -239,7 +255,7 @@ export class PokeApiService {
       }
       //setTimeout(() => {
       resolve({
-        count: this.allPokemonList.length,
+        count: this.filteredPokemonList.length,
         results: detailList,
       });
       // }, 3000);
@@ -247,11 +263,15 @@ export class PokeApiService {
   };
 
   public get = async (pokemonName: string) => {
+    if (this.pokemonDetails[pokemonName]) {
+      return this.pokemonDetails[pokemonName];
+    }
     const listResult = await fetch(this.baseUrl + "pokemon/" + pokemonName);
     if (!listResult.ok) {
       throw new Error("Netzwerkantwort war nicht ok");
     }
     const parsedResult = (await listResult.json()) as Pokemon;
+    this.pokemonDetails[pokemonName] = parsedResult;
     return parsedResult;
   };
 }

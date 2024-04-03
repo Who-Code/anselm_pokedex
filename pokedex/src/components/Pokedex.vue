@@ -3,12 +3,12 @@
     <div class="head">
       <h1>Pokedex</h1>
       <div>
-        <input type="text" v-model="searchQuery" placeholder="Suchen..." />
+        <input type="text" @keyup="RunSearch" v-model="searchQuery" placeholder="Suchen..." />
       </div>
     </div>
     <div class="grid">
       <div v-show="IsLoading">Lade Daten..</div>
-      <div v-show="!IsLoading" v-for="pokemon in filteredPokemons" :key="pokemon.name" class="card">
+      <div v-show="!IsLoading" v-for="pokemon in pokemons" :key="pokemon.name" class="card">
         <router-link :to="`/stats/${pokemon.name}`">
           <p>{{ pokemon.name }}</p>
           <img :src="pokemon.sprites.front_default" alt="" />
@@ -44,6 +44,18 @@ const PageSize = ref(20);
 const PokemonCount = ref(0);
 const IsLoading = ref(false);
 
+const searchDebounceTimer = ref(-1);
+
+const RunSearch = async () => {
+  clearTimeout(searchDebounceTimer.value);
+  searchDebounceTimer.value = setTimeout(async () => {
+    Api.search(searchQuery.value);
+    offset.value = 0;
+    await router.push(`/pokedex/${offset.value}`);
+    init();
+    loadData();
+  }, 1000);
+};
 
 const showNextButton = computed(() => {
   return offset.value + PageSize.value < PokemonCount.value;
@@ -85,12 +97,6 @@ const init = () => {
 
 onMounted(() => {
   init();
-});
-
-const filteredPokemons = computed(() => {
-  return pokemons.value.filter((pokemon) =>
-    pokemon.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
 });
 </script>
 
