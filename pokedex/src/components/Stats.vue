@@ -137,6 +137,6 @@ const playSound = (sound: string) => {
 }
 
 .pokeImage {
-  width: 100;
+  width: 60px;
 }
 </style>

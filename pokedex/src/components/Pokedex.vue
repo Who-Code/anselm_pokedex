@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { PokeApiService, type Pokemon } from "@/services/PokeApiService";
 import { useRouter, useRoute } from "vue-router";
 import { searchItem } from "@/services/PokeApiService";
@@ -50,11 +50,31 @@ const RunSearch = async () => {
   clearTimeout(searchDebounceTimer.value);
   searchDebounceTimer.value = setTimeout(async () => {
     Api.search(searchQuery.value);
-    offset.value = 0;
-    await router.push(`/pokedex/${offset.value}`);
+    const queryOffset = offsetFromQuery();
+    if (queryOffset > Api.filteredPokemonList.length) {
+      offset.value = 0;
+    }
+    await generateRoute();
     init();
     loadData();
   }, 1000);
+};
+
+/**
+ * Erzeugt anhand eines Offset Wertes die zugehörige Seitenzahl.
+ *
+ * @param inputoffset
+ */
+const pageByOffset = (inputoffset: number) => {
+  return inputoffset / PageSize.value + 1;
+};
+
+/**
+ * Erzeugt anhand einer Seitenzahl den zugehörigen Offset Wert
+ * @param page
+ */
+const offsetByPage = (inputPage: number) => {
+  return inputPage * PageSize.value - PageSize.value;
 };
 
 const showNextButton = computed(() => {
@@ -62,7 +82,7 @@ const showNextButton = computed(() => {
 });
 
 const aktuelleSeite = computed(() => {
-  const aktuelleSeite = offset.value / PageSize.value + 1;
+  const aktuelleSeite = pageByOffset(offset.value);
   return aktuelleSeite;
 });
 
@@ -74,9 +94,14 @@ const back = () => {
   changePage(-1 * PageSize.value);
 };
 
+const generateRoute = async () => {
+  console.log("Generate Route");
+  await router.push(`/pokedex?page=${pageByOffset(offset.value)}&search=${searchQuery.value}`);
+};
+
 const changePage = async (changeValue: number) => {
   offset.value += changeValue;
-  await router.push(`/pokedex/${offset.value}`);
+  await generateRoute();
   init();
 };
 
@@ -89,10 +114,30 @@ const loadData = async () => {
   IsLoading.value = false;
 };
 
+watch(route, () => {
+  console.log("Route change");
+  init();
+});
+
 const init = () => {
-  const pageParam = parseInt(route.params.page as string);
-  offset.value = pageParam;
+  parseParams();
   loadData();
+};
+
+const offsetFromQuery = () => {
+  const pageParam = route.query.page ? parseInt(route.query.page as string) : 1;
+  return offsetByPage(pageParam);
+};
+
+const parseParams = () => {
+  // Ist etwas war ? wenn ja : wenn nein
+  const searchParam = route.query.search as string;
+
+  offset.value = offsetFromQuery();
+  if (searchParam && searchParam !== "" && searchParam !== searchQuery.value) {
+    searchQuery.value = searchParam;
+    RunSearch();
+  }
 };
 
 onMounted(() => {

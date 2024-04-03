@@ -221,7 +221,7 @@ export class PokeApiService {
   };
 
   public all = async (): Promise<searchItem[]> => {
-    console.log("All Endpoint");
+    console.error("All Endpoint");
     return new Promise(async (resolve) => {
       if (this.allPokemonList.length > 0) {
         console.log("Resolve Pokemons");
